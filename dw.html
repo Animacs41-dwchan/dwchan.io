@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dwchan - /dw/ Dandy's World Random</title>
     <style>
-        /* TEMA REGULAR 2.0 (4CHAN 2007) RESTAURADO */
+        /* TEMA REGULAR 2.0 (4CHAN 2007) */
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 10pt;
@@ -179,6 +179,7 @@
             const comment = form.elements['comment'].value;
             
             if (!comment) {
+                // Mantém o alerta de validação, pois o comentário é obrigatório.
                 alert('O campo Comentário é obrigatório.');
                 return;
             }
@@ -199,7 +200,7 @@
             // 2. Adiciona o novo post ao início da lista (posts mais novos no topo)
             posts.unshift(newPost);
             
-            // Limita o número de posts (ex: 20 posts) para não sobrecarregar
+            // Limita o número de posts (ex: 20 posts)
             if (posts.length > 20) {
                 posts = posts.slice(0, 20);
             }
@@ -207,8 +208,8 @@
             // 3. Salva a lista atualizada no Local Storage
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
 
-            // 4. Feedback e Recarregamento para exibir o novo post
-            alert('Post salvo no seu Local Storage! Recarregando a board...');
+            // 4. Recarregamento para exibir o novo post
+            // REMOVIDO O ALERT. A recarga agora é silenciosa, simulando o envio.
             window.location.reload(); 
         }
 
@@ -225,7 +226,6 @@
             const emptyMessage = document.getElementById('empty-message');
             
             if (posts && posts.length > 0) {
-                // Remove a mensagem de board vazia
                 if (emptyMessage) {
                     emptyMessage.style.display = 'none';
                 }
