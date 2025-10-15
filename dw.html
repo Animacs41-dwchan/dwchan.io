@@ -57,7 +57,7 @@
         
         /* Post Principal (O Tópico Raiz) */
         .op-post {
-            border: 2px solid #CC0000; /* Destaque para o Original Poster */
+            border: 2px solid #CC0000;
             padding: 12px;
             margin-bottom: 20px;
             background-color: #F0F0F0;
@@ -68,7 +68,7 @@
             border: 1px solid #CCCCCC;
             padding: 10px;
             margin-bottom: 10px;
-            margin-left: 20px; /* Recuo para parecer uma resposta */
+            margin-left: 20px;
             background-color: #F0E0D6;
         }
         
@@ -80,13 +80,22 @@
             margin-bottom: 5px;
         }
         .post-id {
-            color: #008000; /* ID de cor verde */
+            color: #008000;
             font-weight: bold;
         }
         .post-content {
             margin-top: 5px;
             line-height: 1.5;
             white-space: pre-wrap;
+        }
+        
+        /* IMAGEM BASE64 */
+        .post-content img {
+            max-width: 300px; /* Limite o tamanho das imagens Base64 */
+            height: auto;
+            border: 1px solid #C0C0C0;
+            display: block;
+            margin: 10px 0;
         }
         
         /* Área de Postagem/Resposta */
@@ -104,7 +113,7 @@
             border: 1px solid #CCCCCC;
         }
         .new-thread-form input[type="submit"] {
-            background-color: #008000; /* Botão verde para 'Responder' */
+            background-color: #008000;
             color: white;
             padding: 5px 15px;
             border: none;
@@ -135,7 +144,7 @@
             <form id="postForm" onsubmit="savePost(event)">
                 Nome: <input type="text" name="name" value="Anônimo (Toon)" placeholder="Opcional"><br>
                 Comentário: <textarea name="comment" rows="6" placeholder="Responda à thread principal (Regra 20) — Salvo apenas localmente." required></textarea><br>
-                Arquivo: <input type="file" name="file"><br>
+                Arquivo: <input type="file" name="file" id="imageFile" accept="image/*"><br>
                 <input type="submit" value="Responder">
             </form>
             
@@ -154,7 +163,7 @@
                 </div>
                 <div class="post-content">
                     <b>Assunto: Bem-vindes ao /dw/ - Teste de estabilidade!</b><br><br>
-                    Postando o primeiro tópico de teste para o DwChan. Este site é estático e usa Local Storage para posts temporários (só você vê). Sintam-se à vontade para responder e testar o sistema de reply.
+                    Postando o primeiro tópico de teste para o DwChan. **Agora com suporte a imagens!** Carregue uma imagem no campo "Arquivo" para testar a funcionalidade Base64 (salvo apenas localmente).
                 </div>
             </div>
 
@@ -172,7 +181,7 @@
     </div>
 
     <script>
-        const LOCAL_STORAGE_KEY = 'dwchan_dw_replies'; // Chave mudada para 'replies'
+        const LOCAL_STORAGE_KEY = 'dwchan_dw_replies';
 
         function generateToonID() {
             return Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase();
@@ -185,40 +194,61 @@
             return `${date} ${time}`;
         }
         
-        function savePost(event) {
+        /**
+         * Converte o arquivo de imagem para Base64.
+         */
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        // A função savePost agora é assíncrona para esperar a conversão da imagem
+        async function savePost(event) {
             event.preventDefault(); 
 
             const form = document.getElementById('postForm');
             const name = form.elements['name'].value;
             const comment = form.elements['comment'].value;
+            const imageFile = document.getElementById('imageFile').files[0];
             
             if (!comment) {
                 alert('O campo Comentário é obrigatório.');
                 return;
             }
 
+            // Converte a imagem para Base64
+            const imageBase64 = await fileToBase64(imageFile); 
+
             const currentID = document.querySelector('.generated-id').textContent;
             
             const newPost = {
                 name: name === 'Anônimo (Toon)' ? 'Anônimo (Toon)' : name,
                 comment: comment,
+                image: imageBase64, // Salva o Base64 aqui
                 id: currentID,
                 date: getCurrentDate()
             };
 
             let posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
             
-            // Adiciona a nova resposta ao início da lista
             posts.unshift(newPost);
             
-            // Limita o número de respostas
             if (posts.length > 50) {
                 posts = posts.slice(0, 50);
             }
 
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
 
-            // Recarregamento silencioso para mostrar o novo reply
+            // Limpa o formulário e recarrega para mostrar o novo post
+            form.reset(); 
             window.location.reload(); 
         }
 
@@ -238,6 +268,9 @@
                     const postDiv = document.createElement('div');
                     postDiv.className = 'reply-post';
 
+                    // Se houver imagem Base64, cria a tag <img>
+                    const imageHTML = post.image ? `<img src="${post.image}" alt="Imagem postada localmente">` : '';
+
                     const infoHTML = `
                         <div class="post-info">
                             <span style="color: #000000;">${post.name}</span> 
@@ -246,7 +279,10 @@
                             <span class="post-id">${post.id}</span> 
                             [ <a href="#" onclick="alert('Esta resposta não pode ser respondida no sistema de Local Storage.'); return false;">Responder</a> ]
                         </div>
-                        <div class="post-content">${post.comment}</div>
+                        <div class="post-content">
+                            ${imageHTML}
+                            ${post.comment}
+                        </div>
                     `;
                     postDiv.innerHTML = infoHTML;
                     display.appendChild(postDiv);
