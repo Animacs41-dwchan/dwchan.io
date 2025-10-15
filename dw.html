@@ -9,7 +9,7 @@
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 10pt;
-            background-color: #FFFFEE; /* Amarelo pálido, clássico 4chan */
+            background-color: #FFFFEE;
             color: #000000;
             margin: 0;
             padding: 20px;
@@ -47,36 +47,49 @@
         .navmenu a:visited { color: #551A8B; }
         .navmenu a:hover { color: #CC0000; text-decoration: underline; }
 
-        /* Estilo da Thread/Post */
-        .thread {
+        /* Estilo da Thread (Post Principal + Respostas) */
+        #main-thread {
             margin-top: 20px;
             border: 1px solid #BBBBBB; 
             padding: 15px;
             background-color: #FFFFFF;
         }
-        .post {
+        
+        /* Post Principal (O Tópico Raiz) */
+        .op-post {
+            border: 2px solid #CC0000; /* Destaque para o Original Poster */
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: #F0F0F0;
+        }
+        
+        /* Respostas (Replies) */
+        .reply-post {
             border: 1px solid #CCCCCC;
             padding: 10px;
             margin-bottom: 10px;
-            background-color: #F0E0D6; /* Cor de postagem tradicional */
+            margin-left: 20px; /* Recuo para parecer uma resposta */
+            background-color: #F0E0D6;
         }
+        
+        /* Informações do Post */
         .post-info {
-            color: #800000; /* Cor vermelha escura para informações */
+            color: #800000;
             font-weight: bold;
             font-size: 10pt;
             margin-bottom: 5px;
         }
         .post-id {
-            color: #008000; /* ID de cor verde, crucial para a estética */
+            color: #008000; /* ID de cor verde */
             font-weight: bold;
         }
         .post-content {
             margin-top: 5px;
             line-height: 1.5;
-            white-space: pre-wrap; /* Mantém quebras de linha no conteúdo */
+            white-space: pre-wrap;
         }
         
-        /* Área de Postagem */
+        /* Área de Postagem/Resposta */
         .new-thread-form {
             border: 1px solid #BBBBBB;
             padding: 15px;
@@ -91,20 +104,12 @@
             border: 1px solid #CCCCCC;
         }
         .new-thread-form input[type="submit"] {
-            background-color: #CC0000;
+            background-color: #008000; /* Botão verde para 'Responder' */
             color: white;
             padding: 5px 15px;
             border: none;
             cursor: pointer;
             font-weight: bold;
-        }
-        
-        /* Mensagem de Board Vazia */
-        .empty-board {
-            text-align: center;
-            padding: 50px 0;
-            font-size: 14pt;
-            color: #888888;
         }
     </style>
 </head>
@@ -126,13 +131,12 @@
         </div>
 
         <div class="new-thread-form">
-            <h2>Criar Nova Thread</h2>
+            <h2>Resposta Rápida (Reply)</h2>
             <form id="postForm" onsubmit="savePost(event)">
                 Nome: <input type="text" name="name" value="Anônimo (Toon)" placeholder="Opcional"><br>
-                Assunto: <input type="text" name="subject" placeholder="Assunto da thread"><br>
-                Comentário: <textarea name="comment" rows="6" placeholder="O caos é permitido aqui (Regra 20)" required></textarea><br>
+                Comentário: <textarea name="comment" rows="6" placeholder="Responda à thread principal (Regra 20) — Salvo apenas localmente." required></textarea><br>
                 Arquivo: <input type="file" name="file"><br>
-                <input type="submit" value="Postar">
+                <input type="submit" value="Responder">
             </form>
             
             <p style="font-size: 9pt; color: #800000; margin-top: 10px;">
@@ -140,13 +144,25 @@
             </p>
         </div>
 
-        <p style="font-size: 10pt; text-align: right; color: #888;">[ <a href="#">Página Seguinte</a> ]</p>
-
-        <div id="thread-display">
-            <div class="empty-board" id="empty-message">
-                Esta board está vazia. Seja o primeiro a criar uma thread!
+        <div id="main-thread">
+            <div class="op-post">
+                <div class="post-info">
+                    <span style="color: #000000;">Dandy's World OP</span> 
+                    11/08/2025 10:30:00 
+                    No. 
+                    <span class="post-id">A1B2C3D4</span> 
+                </div>
+                <div class="post-content">
+                    <b>Assunto: Bem-vindes ao /dw/ - Teste de estabilidade!</b><br><br>
+                    Postando o primeiro tópico de teste para o DwChan. Este site é estático e usa Local Storage para posts temporários (só você vê). Sintam-se à vontade para responder e testar o sistema de reply.
+                </div>
             </div>
+
+            <div id="reply-display">
+                </div>
         </div>
+        
+        <p style="font-size: 10pt; text-align: right; color: #888; margin-top: 10px;">[ Fim da Thread ]</p>
         
         <hr style="border: 0; height: 1px; background-color: #C0C0C0; margin: 30px 0 15px 0;">
 
@@ -156,10 +172,9 @@
     </div>
 
     <script>
-        const LOCAL_STORAGE_KEY = 'dwchan_dw_posts';
+        const LOCAL_STORAGE_KEY = 'dwchan_dw_replies'; // Chave mudada para 'replies'
 
         function generateToonID() {
-            // Gera um número hexadecimal de 8 caracteres (Ex: AABBCCDD)
             return Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase();
         }
 
@@ -171,15 +186,13 @@
         }
         
         function savePost(event) {
-            event.preventDefault(); // Impede o envio tradicional do formulário
+            event.preventDefault(); 
 
             const form = document.getElementById('postForm');
             const name = form.elements['name'].value;
-            const subject = form.elements['subject'].value;
             const comment = form.elements['comment'].value;
             
             if (!comment) {
-                // Mantém o alerta de validação, pois o comentário é obrigatório.
                 alert('O campo Comentário é obrigatório.');
                 return;
             }
@@ -188,28 +201,24 @@
             
             const newPost = {
                 name: name === 'Anônimo (Toon)' ? 'Anônimo (Toon)' : name,
-                subject: subject,
                 comment: comment,
                 id: currentID,
                 date: getCurrentDate()
             };
 
-            // 1. Carrega posts existentes
             let posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
             
-            // 2. Adiciona o novo post ao início da lista (posts mais novos no topo)
+            // Adiciona a nova resposta ao início da lista
             posts.unshift(newPost);
             
-            // Limita o número de posts (ex: 20 posts)
-            if (posts.length > 20) {
-                posts = posts.slice(0, 20);
+            // Limita o número de respostas
+            if (posts.length > 50) {
+                posts = posts.slice(0, 50);
             }
 
-            // 3. Salva a lista atualizada no Local Storage
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
 
-            // 4. Recarregamento para exibir o novo post
-            // REMOVIDO O ALERT. A recarga agora é silenciosa, simulando o envio.
+            // Recarregamento silencioso para mostrar o novo reply
             window.location.reload(); 
         }
 
@@ -220,48 +229,28 @@
                 element.textContent = randomID;
             });
 
-            // Carrega e exibe os posts
+            // Carrega e exibe as respostas
             const posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
-            const display = document.getElementById('thread-display');
-            const emptyMessage = document.getElementById('empty-message');
+            const display = document.getElementById('reply-display');
             
             if (posts && posts.length > 0) {
-                if (emptyMessage) {
-                    emptyMessage.style.display = 'none';
-                }
-
-                // Cria o contêiner da thread (simulada)
-                const threadDiv = document.createElement('div');
-                threadDiv.className = 'thread';
-
                 posts.forEach(post => {
                     const postDiv = document.createElement('div');
-                    postDiv.className = 'post';
+                    postDiv.className = 'reply-post';
 
-                    // Conteúdo do cabeçalho do post
                     const infoHTML = `
                         <div class="post-info">
                             <span style="color: #000000;">${post.name}</span> 
                             ${post.date} 
                             No. 
                             <span class="post-id">${post.id}</span> 
-                            [ <a href="#" onclick="alert('Funcionalidade de resposta não implementada em site estático.'); return false;">Responder</a> ]
+                            [ <a href="#" onclick="alert('Esta resposta não pode ser respondida no sistema de Local Storage.'); return false;">Responder</a> ]
                         </div>
-                        <div class="post-content">
-                            ${post.subject ? `<b>Assunto: ${post.subject}</b><br><br>` : ''}
-                            ${post.comment}
-                        </div>
+                        <div class="post-content">${post.comment}</div>
                     `;
                     postDiv.innerHTML = infoHTML;
-                    threadDiv.appendChild(postDiv);
+                    display.appendChild(postDiv);
                 });
-
-                display.appendChild(threadDiv);
-
-            } else {
-                 if (emptyMessage) {
-                    emptyMessage.style.display = 'block';
-                }
             }
         }
     </script>
