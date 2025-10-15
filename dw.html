@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dwchan - /dw/ Dandy's World Random</title>
     <style>
-        /* TEMA REGULAR 2.0 (4CHAN 2007) */
+        /* TEMA REGULAR 2.0 (4CHAN 2007) RESTAURADO */
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 10pt;
@@ -48,9 +48,32 @@
         .navmenu a:hover { color: #CC0000; text-decoration: underline; }
 
         /* Estilo da Thread/Post */
+        .thread {
+            margin-top: 20px;
+            border: 1px solid #BBBBBB; 
+            padding: 15px;
+            background-color: #FFFFFF;
+        }
+        .post {
+            border: 1px solid #CCCCCC;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #F0E0D6; /* Cor de postagem tradicional */
+        }
+        .post-info {
+            color: #800000; /* Cor vermelha escura para informações */
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
         .post-id {
             color: #008000; /* ID de cor verde, crucial para a estética */
             font-weight: bold;
+        }
+        .post-content {
+            margin-top: 5px;
+            line-height: 1.5;
+            white-space: pre-wrap; /* Mantém quebras de linha no conteúdo */
         }
         
         /* Área de Postagem */
@@ -85,7 +108,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="loadPosts()">
     <div id="container">
         
         <div class="board-header">
@@ -104,10 +127,10 @@
 
         <div class="new-thread-form">
             <h2>Criar Nova Thread</h2>
-            <form action="#" method="post" onsubmit="alert('O post não pode ser salvo, pois este é um site estático (Regra: sem servidor).'); return false;">
+            <form id="postForm" onsubmit="savePost(event)">
                 Nome: <input type="text" name="name" value="Anônimo (Toon)" placeholder="Opcional"><br>
                 Assunto: <input type="text" name="subject" placeholder="Assunto da thread"><br>
-                Comentário: <textarea name="comment" rows="6" placeholder="O caos é permitido aqui (Regra 20)"></textarea><br>
+                Comentário: <textarea name="comment" rows="6" placeholder="O caos é permitido aqui (Regra 20)" required></textarea><br>
                 Arquivo: <input type="file" name="file"><br>
                 <input type="submit" value="Postar">
             </form>
@@ -119,8 +142,10 @@
 
         <p style="font-size: 10pt; text-align: right; color: #888;">[ <a href="#">Página Seguinte</a> ]</p>
 
-        <div class="empty-board">
-            Esta board está vazia. Seja o primeiro a criar uma thread!
+        <div id="thread-display">
+            <div class="empty-board" id="empty-message">
+                Esta board está vazia. Seja o primeiro a criar uma thread!
+            </div>
         </div>
         
         <hr style="border: 0; height: 1px; background-color: #C0C0C0; margin: 30px 0 15px 0;">
@@ -131,18 +156,114 @@
     </div>
 
     <script>
+        const LOCAL_STORAGE_KEY = 'dwchan_dw_posts';
+
         function generateToonID() {
             // Gera um número hexadecimal de 8 caracteres (Ex: AABBCCDD)
             return Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Aplica o ID a todos os elementos com a classe 'generated-id'
+        function getCurrentDate() {
+            const now = new Date();
+            const date = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            return `${date} ${time}`;
+        }
+        
+        function savePost(event) {
+            event.preventDefault(); // Impede o envio tradicional do formulário
+
+            const form = document.getElementById('postForm');
+            const name = form.elements['name'].value;
+            const subject = form.elements['subject'].value;
+            const comment = form.elements['comment'].value;
+            
+            if (!comment) {
+                alert('O campo Comentário é obrigatório.');
+                return;
+            }
+
+            const currentID = document.querySelector('.generated-id').textContent;
+            
+            const newPost = {
+                name: name === 'Anônimo (Toon)' ? 'Anônimo (Toon)' : name,
+                subject: subject,
+                comment: comment,
+                id: currentID,
+                date: getCurrentDate()
+            };
+
+            // 1. Carrega posts existentes
+            let posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+            
+            // 2. Adiciona o novo post ao início da lista (posts mais novos no topo)
+            posts.unshift(newPost);
+            
+            // Limita o número de posts (ex: 20 posts) para não sobrecarregar
+            if (posts.length > 20) {
+                posts = posts.slice(0, 20);
+            }
+
+            // 3. Salva a lista atualizada no Local Storage
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+
+            // 4. Feedback e Recarregamento para exibir o novo post
+            alert('Post salvo no seu Local Storage! Recarregando a board...');
+            window.location.reload(); 
+        }
+
+        function loadPosts() {
+            // Inicializa o Toon ID
             const randomID = generateToonID();
             document.querySelectorAll('.generated-id').forEach(element => {
                 element.textContent = randomID;
             });
-        });
+
+            // Carrega e exibe os posts
+            const posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+            const display = document.getElementById('thread-display');
+            const emptyMessage = document.getElementById('empty-message');
+            
+            if (posts && posts.length > 0) {
+                // Remove a mensagem de board vazia
+                if (emptyMessage) {
+                    emptyMessage.style.display = 'none';
+                }
+
+                // Cria o contêiner da thread (simulada)
+                const threadDiv = document.createElement('div');
+                threadDiv.className = 'thread';
+
+                posts.forEach(post => {
+                    const postDiv = document.createElement('div');
+                    postDiv.className = 'post';
+
+                    // Conteúdo do cabeçalho do post
+                    const infoHTML = `
+                        <div class="post-info">
+                            <span style="color: #000000;">${post.name}</span> 
+                            ${post.date} 
+                            No. 
+                            <span class="post-id">${post.id}</span> 
+                            [ <a href="#" onclick="alert('Funcionalidade de resposta não implementada em site estático.'); return false;">Responder</a> ]
+                        </div>
+                        <div class="post-content">
+                            ${post.subject ? `<b>Assunto: ${post.subject}</b><br><br>` : ''}
+                            ${post.comment}
+                        </div>
+                    `;
+                    postDiv.innerHTML = infoHTML;
+                    threadDiv.appendChild(postDiv);
+                });
+
+                display.appendChild(threadDiv);
+
+            } else {
+                 if (emptyMessage) {
+                    emptyMessage.style.display = 'block';
+                }
+            }
+        }
     </script>
 </body>
 </html>
