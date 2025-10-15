@@ -48,12 +48,6 @@
         .navmenu a:hover { color: #CC0000; text-decoration: underline; }
 
         /* Estilo da Thread/Post */
-        .thread {
-            margin-top: 20px;
-            border: 1px solid #BBBBBB;
-            padding: 15px;
-            background-color: #FFFFFF;
-        }
         .post-id {
             color: #008000; /* ID de cor verde, crucial para a estética */
             font-weight: bold;
@@ -110,7 +104,7 @@
 
         <div class="new-thread-form">
             <h2>Criar Nova Thread</h2>
-            <form action="#" method="post">
+            <form action="#" method="post" onsubmit="alert('O post não pode ser salvo, pois este é um site estático (Regra: sem servidor).'); return false;">
                 Nome: <input type="text" name="name" value="Anônimo (Toon)" placeholder="Opcional"><br>
                 Assunto: <input type="text" name="subject" placeholder="Assunto da thread"><br>
                 Comentário: <textarea name="comment" rows="6" placeholder="O caos é permitido aqui (Regra 20)"></textarea><br>
@@ -132,7 +126,7 @@
         <hr style="border: 0; height: 1px; background-color: #C0C0C0; margin: 30px 0 15px 0;">
 
         <div style="text-align: center; font-size: 8pt; color: #888888;">
-            dwchan v0.8 (Alpha/Beta) | Hospedado via <a href="https://pages.github.com/">GitHub Pages</a> no domínio dwchan.io. | &copy; 2025 animacs41.
+            dwchan v0.8 (Alpha/Beta) | Hospedado via <a href="https://pages.github.com/">GitHub Pages</a>. | &copy; 2025 animacs41.
         </div>
     </div>
 
