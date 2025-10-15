@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dwchan - /cl/ Changelog (Registro de Alterações)</title>
+    <style>
+        /* TEMA REGULAR 2.0 (4CHAN 2007) */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+            background-color: #FFFFEE;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+        }
+        #container {
+            width: 90%; 
+            max-width: 900px;
+            margin: 0 auto; 
+            padding: 10px;
+        }
+
+        /* Board Header */
+        .board-header h1 {
+            font-size: 18pt;
+            color: #CC0000; 
+            margin: 5px 0 10px 0;
+            border-bottom: 2px solid #CC0000;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+
+        /* Navigation */
+        .navmenu {
+            text-align: center;
+            font-size: 10pt;
+            padding: 5px 0 15px 0;
+            border-bottom: 1px solid #C0C0C0;
+        }
+        .navmenu a {
+            color: #0000FF;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+        .navmenu a:visited { color: #551A8B; }
+        .navmenu a:hover { color: #CC0000; text-decoration: underline; }
+        .current-board { color: #CC0000; font-weight: bold; }
+
+        /* Estilo da Thread (Post Principal + Respostas) */
+        #main-thread {
+            margin-top: 20px;
+            border: 1px solid #BBBBBB; 
+            padding: 15px;
+            background-color: #FFFFFF;
+        }
+        
+        /* Post Principal (O Tópico Raiz) */
+        .op-post {
+            border: 2px solid #CC0000;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: #F0F0F0;
+        }
+        
+        /* Respostas (Replies) */
+        .reply-post {
+            border: 1px solid #CCCCCC;
+            padding: 10px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            background-color: #F0E0D6;
+        }
+        
+        /* Informações do Post */
+        .post-info {
+            color: #800000;
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
+        .post-id {
+            color: #008000;
+            font-weight: bold;
+        }
+        .post-content {
+            margin-top: 5px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        /* IMAGEM BASE64 */
+        .post-content img {
+            max-width: 300px;
+            height: auto;
+            border: 1px solid #C0C0C0;
+            display: block;
+            margin: 10px 0;
+        }
+        
+        /* Área de Postagem/Resposta */
+        .new-thread-form {
+            border: 1px solid #BBBBBB;
+            padding: 15px;
+            background-color: #F0F0F0;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .new-thread-form input[type="text"], .new-thread-form textarea {
+            width: 98%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #CCCCCC;
+        }
+        .new-thread-form input[type="submit"] {
+            background-color: #008000;
+            color: white;
+            padding: 5px 15px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body onload="loadPosts()">
+    <div id="container">
+        
+        <div class="board-header">
+            <h1>/cl/ - Changelog (Registro de Alterações e Updates)</h1>
+        </div>
+
+        <div class="navmenu">
+            [ <a href="/dwchan.io/">INDEX</a> / 
+            <a href="/dwchan.io/dw.html">/dw/</a> /
+            <a href="/dwchan.io/r34.html">/r34/</a> /
+            <a href="/dwchan.io/lr.html">/lr/</a> /
+            <a href="/dwchan.io/ship.html">/ship/</a> /
+            <a href="/dwchan.io/hdcn.html">/hdcn/</a> /
+            <a href="/dwchan.io/art.html">/art/</a> /
+            <a href="/dwchan.io/ss.html">/ss/</a> /
+            <a href="/dwchan.io/grief.html">/grief/</a> /
+            <a href="/dwchan.io/uc.html">/uc/</a> /
+            <a href="/dwchan.io/cl.html" class="current-board">/cl/</a> /
+            <a href="/dwchan.io/ev.html">/ev/</a> /
+            <a href="/dwchan.io/aft.html">/aft/</a> /
+            <a href="/dwchan.io/au.html">/au/</a> /
+            <a href="/dwchan.io/dwc.html">/dwc/</a> /
+            <a href="/dwchan.io/dws.html">/dws/</a> /
+            <a href="/dwchan.io/hdlr.html">/hdlr/</a> /
+            <a href="/dwchan.io/oc.html">/oc/</a> /
+            <a href="/dwchan.io/VV1.html">/VV1/</a> /
+            <a href="/dwchan.io/qna.html">/qna/</a> /
+            <a href="/dwchan.io/rules_full.html">REGRAS (0-70)</a> ]
+        </div>
+
+        <div class="new-thread-form">
+            <h2>Resposta Rápida (Reply)</h2>
+            <form id="postForm" onsubmit="savePost(event)">
+                Nome: <input type="text" name="name" value="Anônimo (Toon)" placeholder="Opcional"><br>
+                Comentário: <textarea name="comment" rows="6" placeholder="Discuta atualizações e mudanças em Dandy's World ou no dwchan aqui (Salvo apenas localmente)." required></textarea><br>
+                Arquivo: <input type="file" name="file" id="imageFile" accept="image/*"><br>
+                <input type="submit" value="Responder">
+            </form>
+            
+            <p style="font-size: 9pt; color: #800000; margin-top: 10px;">
+                Seu Toon ID: <span class="post-id generated-id">Calculando...</span> (Muda a cada carregamento de página - Regra 3)
+            </p>
+        </div>
+
+        <div id="main-thread">
+            <div class="op-post">
+                <div class="post-info">
+                    <span style="color: #000000;">Changelog Admin</span> 
+                    15/10/2025 12:40:00 
+                    No. 
+                    <span class="post-id">CL0GUP</span> 
+                </div>
+                <div class="post-content">
+                    <b>Assunto: Tópico Fixo: Changelog Oficial de Dandy's World e dwchan</b><br><br>
+                    Use esta board para discutir mudanças recentes no canon, nos personagens ou nas regras/funcionalidades do dwchan. O Base64 está ativado.
+                </div>
+            </div>
+
+            <div id="reply-display">
+                </div>
+        </div>
+        
+        <p style="font-size: 10pt; text-align: right; color: #888; margin-top: 10px;">[ Fim da Thread ]</p>
+        
+        <hr style="border: 0; height: 1px; background-color: #C0C0C0; margin: 30px 0 15px 0;">
+
+        <div style="text-align: center; font-size: 8pt; color: #888888;">
+            dwchan v0.8 (Alpha/Beta) | Hospedado via <a href="https://pages.github.com/">GitHub Pages</a>. | &copy; 2025 animacs41.
+        </div>
+    </div>
+
+    <script>
+        // CHAVE ÚNICA PARA /cl/
+        const LOCAL_STORAGE_KEY = 'dwchan_cl_replies'; 
+
+        function generateToonID() {
+            return Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase();
+        }
+
+        function getCurrentDate() {
+            const now = new Date();
+            const date = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            return `${date} ${time}`;
+        }
+        
+        /**
+         * Converte o arquivo de imagem para Base64.
+         */
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        // A função savePost agora é assíncrona
+        async function savePost(event) {
+            event.preventDefault(); 
+
+            const form = document.getElementById('postForm');
+            const name = form.elements['name'].value;
+            const comment = form.elements['comment'].value;
+            const imageFile = document.getElementById('imageFile').files[0];
+            
+            if (!comment) {
+                alert('O campo Comentário é obrigatório.');
+                return;
+            }
+
+            const imageBase64 = await fileToBase64(imageFile); 
+
+            const currentID = document.querySelector('.generated-id').textContent;
+            
+            const newPost = {
+                name: name === 'Anônimo (Toon)' ? 'Anônimo (Toon)' : name,
+                comment: comment,
+                image: imageBase64,
+                id: currentID,
+                date: getCurrentDate()
+            };
+
+            let posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+            
+            posts.unshift(newPost);
+            
+            if (posts.length > 50) {
+                posts = posts.slice(0, 50);
+            }
+
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+
+            form.reset(); 
+            window.location.reload(); 
+        }
+
+        function loadPosts() {
+            // Inicializa o Toon ID
+            const randomID = generateToonID();
+            document.querySelectorAll('.generated-id').forEach(element => {
+                element.textContent = randomID;
+            });
+
+            // Carrega e exibe as respostas
+            const posts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+            const display = document.getElementById('reply-display');
+            
+            if (posts && posts.length > 0) {
+                posts.forEach(post => {
+                    const postDiv = document.createElement('div');
+                    postDiv.className = 'reply-post';
+
+                    const imageHTML = post.image ? `<img src="${post.image}" alt="Imagem postada localmente">` : '';
+
+                    const infoHTML = `
+                        <div class="post-info">
+                            <span style="color: #000000;">${post.name}</span> 
+                            ${post.date} 
+                            No. 
+                            <span class="post-id">${post.id}</span> 
+                            [ <a href="#" onclick="alert('Esta resposta não pode ser respondida no sistema de Local Storage.'); return false;">Responder</a> ]
+                        </div>
+                        <div class="post-content">
+                            ${imageHTML}
+                            ${post.comment}
+                        </div>
+                    `;
+                    postDiv.innerHTML = infoHTML;
+                    display.appendChild(postDiv);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
