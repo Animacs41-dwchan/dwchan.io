@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dwchan - /dw/ Dandy's World Random</title>
+    <style>
+        /* TEMA REGULAR 2.0 (4CHAN 2007) */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+            background-color: #FFFFEE; /* Amarelo pálido, clássico 4chan */
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+        }
+        #container {
+            width: 90%; 
+            max-width: 900px;
+            margin: 0 auto; 
+            padding: 10px;
+        }
+
+        /* Board Header */
+        .board-header h1 {
+            font-size: 18pt;
+            color: #CC0000; 
+            margin: 5px 0 10px 0;
+            border-bottom: 2px solid #CC0000;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+
+        /* Navigation */
+        .navmenu {
+            text-align: center;
+            font-size: 10pt;
+            padding: 5px 0 15px 0;
+            border-bottom: 1px solid #C0C0C0;
+        }
+        .navmenu a {
+            color: #0000FF;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+        .navmenu a:visited { color: #551A8B; }
+        .navmenu a:hover { color: #CC0000; text-decoration: underline; }
+
+        /* Estilo da Thread/Post */
+        .thread {
+            margin-top: 20px;
+            border: 1px solid #BBBBBB;
+            padding: 15px;
+            background-color: #FFFFFF;
+        }
+        .post-id {
+            color: #008000; /* ID de cor verde, crucial para a estética */
+            font-weight: bold;
+        }
+        
+        /* Área de Postagem */
+        .new-thread-form {
+            border: 1px solid #BBBBBB;
+            padding: 15px;
+            background-color: #F0F0F0;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .new-thread-form input[type="text"], .new-thread-form textarea {
+            width: 98%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #CCCCCC;
+        }
+        .new-thread-form input[type="submit"] {
+            background-color: #CC0000;
+            color: white;
+            padding: 5px 15px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Mensagem de Board Vazia */
+        .empty-board {
+            text-align: center;
+            padding: 50px 0;
+            font-size: 14pt;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        
+        <div class="board-header">
+            <h1>/dw/ - Dandy's World Random</h1>
+        </div>
+
+        <div class="navmenu">
+            [ <a href="/">INDEX</a> / 
+            <a href="/dw.html" style="color: #CC0000; font-weight: bold;">/dw/</a> /
+            <a href="/lr.html">/lr/</a> /
+            <a href="/ship.html">/ship/</a> /
+            <a href="/r34.html">/r34/</a> /
+            <a href="/pol.html">/pol/</a> /
+            <a href="/rules_full.html">REGRAS (0-70)</a> ]
+        </div>
+
+        <div class="new-thread-form">
+            <h2>Criar Nova Thread</h2>
+            <form action="#" method="post">
+                Nome: <input type="text" name="name" value="Anônimo (Toon)" placeholder="Opcional"><br>
+                Assunto: <input type="text" name="subject" placeholder="Assunto da thread"><br>
+                Comentário: <textarea name="comment" rows="6" placeholder="O caos é permitido aqui (Regra 20)"></textarea><br>
+                Arquivo: <input type="file" name="file"><br>
+                <input type="submit" value="Postar">
+            </form>
+            
+            <p style="font-size: 9pt; color: #800000; margin-top: 10px;">
+                Seu Toon ID: <span class="post-id generated-id">Calculando...</span> (Muda a cada carregamento de página - Regra 3)
+            </p>
+        </div>
+
+        <p style="font-size: 10pt; text-align: right; color: #888;">[ <a href="#">Página Seguinte</a> ]</p>
+
+        <div class="empty-board">
+            Esta board está vazia. Seja o primeiro a criar uma thread!
+        </div>
+        
+        <hr style="border: 0; height: 1px; background-color: #C0C0C0; margin: 30px 0 15px 0;">
+
+        <div style="text-align: center; font-size: 8pt; color: #888888;">
+            dwchan v0.8 (Alpha/Beta) | Hospedado via <a href="https://pages.github.com/">GitHub Pages</a> no domínio dwchan.io. | &copy; 2025 animacs41.
+        </div>
+    </div>
+
+    <script>
+        function generateToonID() {
+            // Gera um número hexadecimal de 8 caracteres (Ex: AABBCCDD)
+            return Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aplica o ID a todos os elementos com a classe 'generated-id'
+            const randomID = generateToonID();
+            document.querySelectorAll('.generated-id').forEach(element => {
+                element.textContent = randomID;
+            });
+        });
+    </script>
+</body>
+</html>
